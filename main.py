@@ -1,15 +1,15 @@
-from fastapi import FastAPI
-import os 
-from dotenv import load_dotenv
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-load_dotenv(os.path.join(BASE_DIR, ".config", ".env"))
+from fastapi import FastAPI, Depends
+# load secrets from dotenv
+import config
+from src.routers.index import indexRouter
 
 app = FastAPI()
 
-@app.get("/")
+@app.get("/hc")
 async def root():
     return {
-        "message": "Hello world"
+        "message": "Server is Running!"
     }
+
+## /api Routers
+app.include_router(indexRouter)
