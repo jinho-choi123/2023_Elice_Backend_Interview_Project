@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, ARRAY
 from sqlalchemy.orm import relationship
 
-from .db import Base
+from .database import Base, engine
 
 class User(Base):
     __tablename__ = "users"
@@ -31,3 +31,5 @@ class Post(Base):
     board_id = Column(Integer, ForeignKey("boards.id"))
     board = relationship("Board", back_populates="posts")
     is_active = Column(Boolean, default=True)
+
+Base.metadata.create_all(bind=engine)
