@@ -8,6 +8,7 @@ class userCreation(BaseModel):
     boards: list
 
 class userSession(BaseModel):
+    id: int
     fullName: str 
     email: str 
     boards: list
