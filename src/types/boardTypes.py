@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel
 
 class boardBaseRequest(BaseModel):
@@ -17,8 +18,22 @@ class boardResponse(BaseModel):
     success: bool
     message: str 
 
-class boardGetResponse(BaseModel):
+class boardObj(BaseModel):
     id: int
     name: str
     isPublic: bool 
     posts: list 
+    creator_id: int
+
+class boardObjResponse(boardResponse):
+    board: boardObj | None
+
+class boardListResponse(boardResponse):
+    boards: List[boardObj] | None 
+
+class boardPagination(BaseModel):
+    # page number 
+    page: int 
+    # amount of boards in single page
+    pageSize: int 
+    
