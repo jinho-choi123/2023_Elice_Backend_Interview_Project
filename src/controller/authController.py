@@ -1,4 +1,3 @@
-import email
 import os
 from sqlalchemy.orm import Session 
 from sqlalchemy import select
