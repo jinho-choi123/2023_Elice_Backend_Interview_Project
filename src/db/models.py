@@ -17,11 +17,11 @@ class User(Base):
 class Board(Base):
     __tablename__ = "boards"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    name = Column(String, unique=True)
     isPublic = Column(Boolean, index=True, default=True)
     creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     creator: Mapped["User"] = relationship(back_populates="boards")
     posts: Mapped[List["Post"]] = relationship(back_populates="board")
-    is_active = Column(Boolean, default=True)
 
 class Post(Base):
     __tablename__ = "posts"
@@ -31,6 +31,5 @@ class Post(Base):
     creator = Column(Integer, ForeignKey("users.id"))
     board_id: Mapped[int] = mapped_column(ForeignKey("boards.id"))
     board: Mapped["Board"] = relationship(back_populates="posts")
-    is_active = Column(Boolean, default=True)
 
 Base.metadata.create_all(bind=engine)
