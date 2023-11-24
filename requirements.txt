@@ -1,5 +1,6 @@
 annotated-types==0.6.0
 anyio==3.7.1
+async-timeout==4.0.3
 build==1.0.3
 CacheControl==0.13.1
 certifi==2023.11.17
@@ -41,6 +42,7 @@ platformdirs==3.11.0
 poetry==1.7.1
 poetry-core==1.8.1
 poetry-plugin-export==1.6.0
+psycopg2-binary==2.9.9
 ptyprocess==0.7.0
 pycparser==2.21
 pydantic==2.5.2
@@ -52,6 +54,7 @@ python-dotenv==1.0.0
 python-multipart==0.0.6
 PyYAML==6.0.1
 rapidfuzz==3.5.2
+redis==5.0.1
 requests==2.31.0
 requests-toolbelt==1.0.0
 SecretStorage==3.3.3
