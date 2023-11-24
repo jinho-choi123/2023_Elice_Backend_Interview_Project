@@ -80,3 +80,9 @@ def user_signin(db: Session, signinForm: authSigninRequest):
     else:
         ## login Failed!!
         return None
+    
+# signout user
+# expire redis session
+def user_signout(cookie: str):
+    redis_client.delete(cookie)
+    return

@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Response, Cookie
+from requests import session
 from src.types.authTypes import authSignupRequest, authSigninRequest, authResponse
-from src.controller.authController import check_user_exists, user_signin, user_signup
+from src.controller.authController import check_user_exists, user_signin, user_signout, user_signup
 
 from src.db.database import SessionLocal
 from src.db.models import User
@@ -32,14 +33,16 @@ def auth_Signin(signinForm: authSigninRequest, response: Response) -> authRespon
     if cookie:
         ## login success 
         ## set cookie 
-        response.set_cookie(key='session.id', value=cookie)
+        response.set_cookie(key='session_id', value=cookie)
         return authResponse(success = True, message = "signin success")
     else:
         return authResponse(success = False, message = "invalid password!")
 
 @authRouter.post("/signout")
-def auth_Signout():
-    return {
-        "message": "this is signout endpoint"
-    }
+def auth_Signout(response: Response, session_id: str | None = Cookie(default=None)):
+    user_signout(session_id)
+
+    ## then remove cookie 
+    response.delete_cookie(key='session_id')
+    return authResponse(success = True, message = "logout success")
 
