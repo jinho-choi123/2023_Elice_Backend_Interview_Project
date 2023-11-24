@@ -97,5 +97,6 @@ def get_user_session(db: Session, user_id: int):
         return userSession(
             fullName = result.fullName,
             email =  result.email,
-            boards = result.boards
+            boards = result.boards,
+            id = user_id
         )
