@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Response, Cookie
+from fastapi import APIRouter, Response, Cookie, Depends
 from requests import session
+from src.middlewares.authMiddleware import get_current_user
 from src.types.authTypes import authSignupRequest, authSigninRequest, authResponse
+from src.types.userTypes import userSession
 from src.controller.authController import check_user_exists, user_signin, user_signout, user_signup
 
 from src.db.database import SessionLocal
@@ -40,6 +42,7 @@ def auth_Signin(signinForm: authSigninRequest, response: Response) -> authRespon
 
 @authRouter.post("/signout")
 def auth_Signout(response: Response, session_id: str | None = Cookie(default=None)):
+    user = get_current_user(session_id)
     user_signout(session_id)
 
     ## then remove cookie 

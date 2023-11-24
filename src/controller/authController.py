@@ -1,3 +1,4 @@
+import email
 import os
 from sqlalchemy.orm import Session 
 from sqlalchemy import select
@@ -8,6 +9,7 @@ from src.utils.hash import check_password_match, generate_rand_salt, hash_passwo
 from sqlalchemy.exc import SQLAlchemyError
 from src.db.database import redis_client
 from src.utils.session import generate_cookie
+from src.types.userTypes import userSession
 
 # return True if user does not exists
 # return False o/w
@@ -86,3 +88,15 @@ def user_signin(db: Session, signinForm: authSigninRequest):
 def user_signout(cookie: str):
     redis_client.delete(cookie)
     return
+
+def get_user_session(db: Session, user_id: int):
+    stmt = select(models.User).where(models.User.id == user_id)
+    result = db.scalar(stmt)
+    if not result:
+        return None 
+    else:
+        return userSession(
+            fullName = result.fullName,
+            email =  result.email,
+            boards = result.boards
+        )

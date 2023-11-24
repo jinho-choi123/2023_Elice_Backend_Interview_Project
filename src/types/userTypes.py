@@ -6,3 +6,8 @@ class userCreation(BaseModel):
     password_salt: str 
     password_hash: str 
     boards: list
+
+class userSession(BaseModel):
+    fullName: str 
+    email: str 
+    boards: list
