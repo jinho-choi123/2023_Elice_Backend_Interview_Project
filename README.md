@@ -22,6 +22,8 @@
 ### Prerequisites
 **You'll need to have Python 3.10 or later on your local development machine.**
 
+We recommend to use venv to isolate enviroments from other projects.
+
 or you can run server inside docker container
 ```bash
 $ python --version 
@@ -42,6 +44,7 @@ We expect Postgres server to be running on port 25000.
 This can be easily done using docker compose. Please look at [here](#setting-redis-and-postgres)
 
 **Environment Secrets**
+
 List of environment variables required are specified in [here](https://github.com/jinho-choi123/2023_Alice_Backend_Interview_Project/blob/main/.config/.env.example)
 
 **!Important: Please be careful not to upload any kind of secrets on github**
