@@ -1,4 +1,3 @@
-from itertools import count
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -9,11 +8,12 @@ from src.db import models, database
 from src.types.boardTypes import boardBaseRequest, boardDeletion, boardGet, boardObj, boardPagination, boardUpdate
 import math
 
+from src.types.postTypes import postObj
+
 ## check if current user is board's owner
 def is_board_owner(board_id: int, userSession: userSession):
-    owner_boards_ids = list(map(lambda board: board.id, userSession.boards))
     # just check if userSession's board include board_id 
-    if board_id in owner_boards_ids:
+    if board_id in userSession.board_ids:
         # current user is board's owner 
         return True 
     else:
@@ -25,7 +25,12 @@ def get_board_by_id(db: Session, board_id: int)->boardObj:
     if not result:
         return None 
     else:
-        returnObj = boardObj(id = result[0].id, name = result[0].name, isPublic = result[0].isPublic, posts = result[0].posts, creator_id = result[0].creator_id)
+        board_posts = list()
+        for post in result[0].posts:
+            board_posts.append(
+                post.id
+            )
+        returnObj = boardObj(id = result[0].id, name = result[0].name, isPublic = result[0].isPublic, post_ids = board_posts, creator_id = result[0].creator_id)
         return returnObj
 
 def get_board_by_name(db: Session, board_name: str)->boardObj:
@@ -34,7 +39,12 @@ def get_board_by_name(db: Session, board_name: str)->boardObj:
     if not result:
         return None 
     else:
-        returnObj = boardObj(id = result[0].id, name = result[0].name, isPublic = result[0].isPublic, posts = result[0].posts, creator_id = result[0].creator_id)
+        board_posts = list()
+        for post in result[0].posts:
+            board_posts.append(
+                post.id
+            )
+        returnObj = boardObj(id = result[0].id, name = result[0].name, isPublic = result[0].isPublic, post_ids = board_posts, creator_id = result[0].creator_id)
         return returnObj
 
 # check board name exists except the given board id
@@ -87,10 +97,16 @@ def board_update(db: Session, boardForm: boardUpdate):
 
 
 def board_delete(db: Session, boardForm: boardDeletion):
-    stmt = delete(models.Board).where(models.Board.id == boardForm.id)
-    db.execute(stmt)
-    db.commit()
-    return True
+    try:
+        stmt = delete(models.Board).where(models.Board.id == boardForm.id)
+        db.execute(stmt)
+        db.commit()
+        return True
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code = status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail = str(e.orig)
+        )
 
 def board_get(db: Session, user_session: userSession, boardForm: boardGet):
     board = get_board_by_id(db, boardForm.id)
@@ -132,12 +148,20 @@ def boards_pagination(db: Session, board_pagination: boardPagination, total_boar
     boards_result = list()
 
     for board in list(boards_list):
+        #serialize posts
+        # not a performance issue due to pagination
+        board_posts = list()
+        for post in board[0].posts:
+            board_posts.append(
+                post.id
+            )
+
         boards_result.append(
             boardObj(
                 id = board[0].id,
                 name = board[0].name,
                 isPublic = board[0].isPublic,
-                posts = board[0].posts,
+                post_ids = board_posts,
                 creator_id = board[0].creator_id
             )
         )

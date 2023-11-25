@@ -12,24 +12,26 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     password_salt = Column(String)
     password_hash = Column(String)
-    boards: Mapped[List["Board"]] = relationship( back_populates="creator")
+    boards: Mapped[List["Board"]] = relationship( back_populates="creator", cascade="all, delete", passive_deletes=True)
+    posts: Mapped[List["Post"]] = relationship( back_populates="creator", cascade="all, delete", passive_deletes=True)
 
 class Board(Base):
     __tablename__ = "boards"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String, unique=True)
     isPublic = Column(Boolean, index=True, default=True)
-    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     creator: Mapped["User"] = relationship(back_populates="boards")
-    posts: Mapped[List["Post"]] = relationship(back_populates="board")
+    posts: Mapped[List["Post"]] = relationship(back_populates="board", cascade="all, delete", passive_deletes=True)
 
 class Post(Base):
     __tablename__ = "posts"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     title = Column(String, index=True)
     content = Column(String, index=True)
-    creator = Column(Integer, ForeignKey("users.id"))
-    board_id: Mapped[int] = mapped_column(ForeignKey("boards.id"))
+    creator_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    creator: Mapped["User"] = relationship(back_populates="posts")
+    board_id: Mapped[int] = mapped_column(ForeignKey("boards.id", ondelete="CASCADE"))
     board: Mapped["Board"] = relationship(back_populates="posts")
 
 Base.metadata.create_all(bind=engine)
