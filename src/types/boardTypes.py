@@ -1,6 +1,8 @@
 from typing import List
 from pydantic import BaseModel
 
+from src.types.postTypes import postObj
+
 class boardBaseRequest(BaseModel):
     isPublic: bool
     name: str 
@@ -22,7 +24,7 @@ class boardObj(BaseModel):
     id: int
     name: str
     isPublic: bool 
-    posts: list 
+    posts: List[postObj]
     creator_id: int
 
 class boardObjResponse(boardResponse):

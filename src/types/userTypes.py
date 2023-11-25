@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel
 
 class userCreation(BaseModel):
@@ -11,4 +12,5 @@ class userSession(BaseModel):
     id: int
     fullName: str 
     email: str 
-    boards: list
+    board_ids: List[int]
+    post_ids: List[int]
