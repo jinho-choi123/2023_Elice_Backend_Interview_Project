@@ -107,7 +107,7 @@ def board_List(page: int = 0, pageSize: int = 10, session_id: str | None = Cooki
     showing_boards = boards_pagination(db, board_pagination, total_boards, user)
     return boardListResponse(
         success = True,
-        message = "Board List API",
+        message = "Board getting list success!",
         boards = showing_boards
     )
 
