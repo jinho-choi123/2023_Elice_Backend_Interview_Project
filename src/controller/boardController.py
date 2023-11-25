@@ -120,15 +120,22 @@ def board_get(db: Session, user_session: userSession, boardForm: boardGet):
 def boards_pagination(db: Session, board_pagination: boardPagination, total_boards_size: int, user_session: userSession):
     pageNum = board_pagination.page
     pageSize = board_pagination.pageSize
+
     # if pageNum <= 0 then set pageNum to 1
     if pageNum <= 0:
         pageNum = 1
 
+    print(total_boards_size)
     lastPageNum = math.ceil(total_boards_size / pageSize)
+    print(lastPageNum)
 
     # if pageNum exceeds boards_size/pageSize, then return end page
     if pageNum > lastPageNum:
         pageNum = lastPageNum
+        
+    # if pageNum <= 0 then set pageNum to 1
+    if pageNum <= 0:
+        pageNum = 1
 
     # calculate offset and limit
     offset = (pageNum - 1) * pageSize
