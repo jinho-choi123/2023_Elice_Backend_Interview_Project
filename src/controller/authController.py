@@ -94,9 +94,19 @@ def get_user_session(db: Session, user_id: int):
     if not result:
         return None 
     else:
+        # get user's owning boards and posts ids
+        board_ids = list()
+        post_ids = list()
+        for board in result.boards:
+            board_ids.append(int(board.id))
+
+        for post in result.posts:
+            post_ids.append(int(post.id))
+
         return userSession(
             fullName = result.fullName,
             email =  result.email,
-            boards = result.boards,
+            board_ids = board_ids,
+            post_ids = post_ids,
             id = user_id
         )
