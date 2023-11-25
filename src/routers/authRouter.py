@@ -28,7 +28,7 @@ def auth_Signup(signupForm: authSignupRequest) -> authResponse:
 def auth_Signin(signinForm: authSigninRequest, response: Response) -> authResponse:
     db = SessionLocal()
     if(check_user_exists(db, signinForm.email)):
-        return authResponse(success = False, message = "User with given email does not exists.")
+        return authResponse(success = False, message = "Invalid email or password.")
 
     # check password 
     cookie = user_signin(db, signinForm)
@@ -38,7 +38,7 @@ def auth_Signin(signinForm: authSigninRequest, response: Response) -> authRespon
         response.set_cookie(key='session_id', value=cookie)
         return authResponse(success = True, message = "signin success")
     else:
-        return authResponse(success = False, message = "invalid password!")
+        return authResponse(success = False, message = "Invalid email or password.")
 
 @authRouter.post("/signout")
 def auth_Signout(response: Response, session_id: str | None = Cookie(default=None)):

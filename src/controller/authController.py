@@ -66,7 +66,7 @@ def user_signin(db: Session, signinForm: authSigninRequest):
 
     ## must not happen 
     if(not result):
-        raise Exception("user with given email does not exist")
+        raise Exception("Invalid email or password.")
     
     stored_passwordHash = result.password_hash
     password_salt = result.password_salt
