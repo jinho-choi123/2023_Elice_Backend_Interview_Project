@@ -81,7 +81,7 @@ def board_Delete(board_id: int, session_id: str | None = Cookie(default=None)):
     if not is_board_owner(board_id, user):
         return boardResponse(
             success = False,
-            message = "LoggedIn user is not board owner."
+            message = "User is not board owner."
         )
     
     boardForm = boardDeletion(
@@ -112,7 +112,7 @@ def board_List(page: int = 0, pageSize: int = 10, session_id: str | None = Cooki
     )
 
 @boardRouter.get("/{board_id}")
-def board_get(board_id: int, session_id: str | None = Cookie(default=None)):
+def board_Get(board_id: int, session_id: str | None = Cookie(default=None)):
     user = get_current_user(session_id)
     db = SessionLocal()
     board = get_board_by_id(db, board_id)

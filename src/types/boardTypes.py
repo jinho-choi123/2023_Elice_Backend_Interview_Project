@@ -24,7 +24,7 @@ class boardObj(BaseModel):
     id: int
     name: str
     isPublic: bool 
-    posts: List[postObj]
+    post_ids: List[int]
     creator_id: int
 
 class boardObjResponse(boardResponse):
