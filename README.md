@@ -20,7 +20,7 @@
     - [Author](#author)
 
 ### Prerequisites
-**You'll need to have Python 3.10 or later on your local development and production machine.**
+**You'll need to have Python 3.10 or later on your local development machine.**
 
 or you can run server inside docker container
 ```bash
@@ -53,7 +53,7 @@ List of environment variables required are specified in [here](https://github.co
 Run the following commands to setup redis and postgres server.
 Please refer to [docker-compose.yml](https://github.com/jinho-choi123/2023_Alice_Backend_Interview_Project/blob/main/.docker/docker-compose.yml) to get more info.
 ```bash
-$ cd .config
+$ cd .docker
 $ docker compose -p 2023-alice-interview up -d
 ```
 
