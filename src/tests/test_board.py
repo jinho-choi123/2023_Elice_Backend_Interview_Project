@@ -108,14 +108,21 @@ def test_board_integrated(refresh_db, refresh_redis):
 
     # board update
     updateBoardForm = boardBaseRequest(
-        name = "mangohaschanged",
-        isPublic = True
+        name = "updated board name",
+        isPublic = False
     )
     response = client.patch("/api/board/1", json = updateBoardForm.model_dump())
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == boardResponse(
+    assert response.json() == boardObjResponse(
         success = True,
-        message = "Board update success!"
+        message = "Board update success!",
+        board = boardObj(
+            id = 1,
+            name = "updated board name",
+            isPublic = False,
+            post_ids = [],
+            creator_id = 1
+        )
     ).model_dump()
 
     # board delete
@@ -127,6 +134,16 @@ def test_board_integrated(refresh_db, refresh_redis):
         success = True,
         message = "Board deletion success!"
     ).model_dump()
+
+    # get deleted board
+    response = client.get("/api/board/1")
+    assert response.status_code == status.HTTP_200_OK
+    
+    assert response.json() == boardObjResponse(
+            success = False,
+            message = "Board does not exists",
+            board = None
+        ).model_dump()
 
 
 def test_board_list_api_order(refresh_db, refresh_redis):
