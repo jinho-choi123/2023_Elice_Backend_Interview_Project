@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Cookie, Response, status
+from fastapi import APIRouter, Cookie, Depends
+from sqlalchemy.orm import Session
 from src.controller.postController import get_post_by_id, is_post_owner, post_create, post_delete, post_update, posts_pagination, total_posts_size
-from src.db.database import SessionLocal
+from src.db.database import get_db
 
 from src.middlewares.authMiddleware import get_current_user
 from src.types.postTypes import postBaseRequest, postDeletion, postListResponse, postObjResponse, postPagination, postResponse 
@@ -12,10 +13,7 @@ postRouter = APIRouter(
 
     
 @postRouter.post("/")
-def post_Create(postForm: postBaseRequest, session_id: str | None = Cookie(default=None)):
-    user = get_current_user(session_id)
-    db = SessionLocal()
-
+def post_Create(postForm: postBaseRequest, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
     # create post 
     newPost = post_create(db, postForm, user)
 
@@ -34,10 +32,7 @@ def post_Create(postForm: postBaseRequest, session_id: str | None = Cookie(defau
     )
 
 @postRouter.patch("/")
-def post_Update(postForm: postBaseRequest, session_id: str | None = Cookie(default=None)):
-    user = get_current_user(session_id)
-    db = SessionLocal()
-
+def post_Update(postForm: postBaseRequest, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
     if not is_post_owner(postForm.id, user):
         return postResponse(
             success = False,
@@ -51,10 +46,7 @@ def post_Update(postForm: postBaseRequest, session_id: str | None = Cookie(defau
     )
 
 @postRouter.delete("/{post_id}")
-def post_Delete(post_id: int, session_id: str | None = Cookie(default=None)):
-    user = get_current_user(session_id)
-    db = SessionLocal()
-
+def post_Delete(post_id: int, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
     if not get_post_by_id(db, post_id):
         return postResponse(
             success = False,
@@ -78,9 +70,7 @@ def post_Delete(post_id: int, session_id: str | None = Cookie(default=None)):
     )
 
 @postRouter.get("/list")
-def post_List(boardId: int, page: int = 0, pageSize: int = 10, session_id: str | None = Cookie(default=None)):
-    user = get_current_user(session_id)
-
+def post_List(boardId: int, page: int = 0, pageSize: int = 10, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
     if not boardId:
         return postListResponse(
             success = False,
@@ -89,8 +79,6 @@ def post_List(boardId: int, page: int = 0, pageSize: int = 10, session_id: str |
         )
     
     post_pagination = postPagination(page = page, pageSize = pageSize, boardId = boardId)
-
-    db = SessionLocal()
 
     total_posts = total_posts_size(db)
 
@@ -103,10 +91,7 @@ def post_List(boardId: int, page: int = 0, pageSize: int = 10, session_id: str |
     )
 
 @postRouter.get("/{post_id}")
-def post_Get(post_id: int, session_id: str | None = Cookie(default=None)):
-    user = get_current_user(session_id)
-
-    db = SessionLocal()
+def post_Get(post_id: int, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
     post = get_post_by_id(db, post_id)
 
     if not post:

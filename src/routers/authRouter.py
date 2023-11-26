@@ -1,20 +1,18 @@
 from fastapi import APIRouter, Response, Cookie, Depends
-from requests import session
+from sqlalchemy.orm import Session
 from src.middlewares.authMiddleware import get_current_user
 from src.types.authTypes import authSignupRequest, authSigninRequest, authResponse
 from src.types.userTypes import userSession
 from src.controller.authController import check_user_exists, user_signin, user_signout, user_signup
 
-from src.db.database import SessionLocal
-from src.db.models import User
+from src.db.database import SessionLocal, get_db
 
 authRouter = APIRouter(
     prefix="/auth",
 )
 
 @authRouter.post("/signup")
-def auth_Signup(signupForm: authSignupRequest) -> authResponse:
-    db = SessionLocal()
+def auth_Signup(signupForm: authSignupRequest, db: Session = Depends(get_db)) -> authResponse:
     # check if user email is already occupied 
     if(not check_user_exists(db, signupForm.email)):
         # duplicate email! 
@@ -25,8 +23,7 @@ def auth_Signup(signupForm: authSignupRequest) -> authResponse:
     return authResponse(success = True, message = "signup success")
 
 @authRouter.post("/signin")
-def auth_Signin(signinForm: authSigninRequest, response: Response) -> authResponse:
-    db = SessionLocal()
+def auth_Signin(signinForm: authSigninRequest, response: Response, db: Session = Depends(get_db)) -> authResponse:
     if(check_user_exists(db, signinForm.email)):
         return authResponse(success = False, message = "Invalid email or password.")
 
@@ -41,8 +38,7 @@ def auth_Signin(signinForm: authSigninRequest, response: Response) -> authRespon
         return authResponse(success = False, message = "Invalid email or password.")
 
 @authRouter.post("/signout")
-def auth_Signout(response: Response, session_id: str | None = Cookie(default=None)):
-    user = get_current_user(session_id)
+def auth_Signout(response: Response, session_id: str | None = Cookie(default=None), user = Depends(get_current_user)):
     user_signout(session_id)
 
     ## then remove cookie 
