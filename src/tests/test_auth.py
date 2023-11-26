@@ -4,7 +4,7 @@ from fastapi import status
 from src.types.authTypes import authSigninRequest, authSignupRequest, authResponse
 
 from main import app
-from utils.test_db_setup import override_get_db, refresh_db
+from src.utils.test_db_setup import override_get_db, refresh_db
 from src.db.database import get_db
 
 app.dependency_overrides[get_db] = override_get_db
