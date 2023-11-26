@@ -13,7 +13,7 @@ postRouter = APIRouter(
 
     
 @postRouter.post("/")
-def post_Create(postForm: postBaseRequest, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
+def post_Create(postForm: postBaseRequest, db: Session = Depends(get_db), user = Depends(get_current_user)):
     # create post 
     newPost = post_create(db, postForm, user)
 
@@ -32,7 +32,7 @@ def post_Create(postForm: postBaseRequest, session_id: str | None = Cookie(defau
     )
 
 @postRouter.patch("/")
-def post_Update(postForm: postBaseRequest, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
+def post_Update(postForm: postBaseRequest, db: Session = Depends(get_db), user = Depends(get_current_user)):
     if not is_post_owner(postForm.id, user):
         return postResponse(
             success = False,
@@ -46,7 +46,7 @@ def post_Update(postForm: postBaseRequest, session_id: str | None = Cookie(defau
     )
 
 @postRouter.delete("/{post_id}")
-def post_Delete(post_id: int, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
+def post_Delete(post_id: int, db: Session = Depends(get_db), user = Depends(get_current_user)):
     if not get_post_by_id(db, post_id):
         return postResponse(
             success = False,
@@ -70,7 +70,7 @@ def post_Delete(post_id: int, session_id: str | None = Cookie(default=None), db:
     )
 
 @postRouter.get("/list")
-def post_List(boardId: int, page: int = 0, pageSize: int = 10, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
+def post_List(boardId: int, page: int = 0, pageSize: int = 10, db: Session = Depends(get_db), user = Depends(get_current_user)):
     if not boardId:
         return postListResponse(
             success = False,
@@ -91,7 +91,7 @@ def post_List(boardId: int, page: int = 0, pageSize: int = 10, session_id: str |
     )
 
 @postRouter.get("/{post_id}")
-def post_Get(post_id: int, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
+def post_Get(post_id: int, db: Session = Depends(get_db), user = Depends(get_current_user)):
     post = get_post_by_id(db, post_id)
 
     if not post:
