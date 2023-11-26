@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Response, Cookie, Depends
+from fastapi import APIRouter, Response, Cookie, Depends, status
 from sqlalchemy.orm import Session
 from src.middlewares.authMiddleware import get_current_user
 from src.types.authTypes import authSignupRequest, authSigninRequest, authResponse
@@ -25,6 +25,7 @@ def auth_Signup(signupForm: authSignupRequest, db: Session = Depends(get_db)) ->
 @authRouter.post("/signin")
 def auth_Signin(signinForm: authSigninRequest, response: Response, db: Session = Depends(get_db)) -> authResponse:
     if(check_user_exists(db, signinForm.email)):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
         return authResponse(success = False, message = "Invalid email or password.")
 
     # check password 
