@@ -11,7 +11,6 @@ async def get_current_user(session_id: str | None = Cookie(default=None), db = D
         )
     # get user id from cookie value 
     user_id = redis_client.get(session_id)
-    user_id = int(user_id)
 
     if not user_id:
         raise HTTPException(
@@ -19,6 +18,7 @@ async def get_current_user(session_id: str | None = Cookie(default=None), db = D
             detail = "Invalid cookie value",
         )
     
+    user_id = int(user_id)
     
     user_session = get_user_session(db, user_id)
 
