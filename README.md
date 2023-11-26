@@ -70,16 +70,30 @@ You need Postgres and Redis running on your local machine before running our ser
 ```
 Run Dev server
 ```bash
+# create .config/.env
+$ cp .config/.env.example .config/.env
+
+# fill out .env file 
+$ vim .config/.env
+
+# check if python 3.10 or above is installed
+$ python --version
+
+# setup python venv
 $ python -m venv .venv 
 $ source .venv/bin/activate
 
+# install required packages
 $ pip install -r requirements.txt
+
+# run fast api server with hot reload
 $ uvicorn main:app --reload
 ```
 
 #### API testing
 ```bash
 # You can run API Tests by running the following command in your project root
+# Make sure you activated python venv
 $ python -m pytest -v
 ```
 **If you want to add your custom testing, then add test_{your test name}.py to src/tests directory. Also refer to [Fast API Testing](https://fastapi.tiangolo.com/tutorial/testing/).**
