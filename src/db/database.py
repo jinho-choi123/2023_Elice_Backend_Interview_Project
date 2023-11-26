@@ -15,6 +15,13 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
+def get_db():
+    try:
+        db = SessionLocal()
+        yield db 
+    finally:
+        db.close()
+
 ## create connection to redis 
 redis_client = redis.from_url(REDIS_URL)
 
