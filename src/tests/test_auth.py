@@ -1,42 +1,16 @@
-import os
-import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
 
 from fastapi import status
 from src.types.authTypes import authSigninRequest, authSignupRequest, authResponse
 
 from main import app
-from src.db.database import Base, get_db
-
-
-# Get Test DB URL
-TEST_DB_URL = os.environ["POSTGRES_TEST_DB_URL"]
-
-engine = create_engine(TEST_DB_URL)
-
-TEST_SessionLocal = sessionmaker(autocommit = False, autoflush=False, bind=engine)
-
-Base.metadata.create_all(bind=engine)
-
-def override_get_db():
-    try: 
-        db = TEST_SessionLocal()
-        yield db 
-    finally:
-        db.close()
-
-@pytest.fixture()
-def refresh_db():
-    Base.metadata.create_all(bind=engine)
-    yield
-    Base.metadata.drop_all(bind=engine)
+from utils.test_db_setup import override_get_db, refresh_db
+from src.db.database import get_db
 
 app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
+
 
 # signin invalid email and password
 def test_signin_with_invalid_email_password(refresh_db):
