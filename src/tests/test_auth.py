@@ -85,7 +85,7 @@ def test_signin_with_invalid_password(refresh_db):
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     assert response.json() == authResponse(success=False, message = "Invalid email or password.").model_dump()
 
-def test_signup_signin_signout(refresh_db):
+def test_auth_integrated(refresh_db):
     signupForm = authSignupRequest(
         email = "mango@mango.mango",
         password = "simplepassword",

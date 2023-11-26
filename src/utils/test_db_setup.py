@@ -23,6 +23,7 @@ def override_get_db():
 
 @pytest.fixture()
 def refresh_db():
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     yield
-    Base.metadata.drop_all(bind=engine)
+
