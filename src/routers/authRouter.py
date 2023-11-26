@@ -38,8 +38,7 @@ def auth_Signin(signinForm: authSigninRequest, response: Response, db: Session =
         return authResponse(success = False, message = "Invalid email or password.")
 
 @authRouter.post("/signout")
-def auth_Signout(response: Response, session_id: str | None = Cookie(default=None)):
-    user = get_current_user(session_id)
+def auth_Signout(response: Response, session_id: str | None = Cookie(default=None), user = Depends(get_current_user)):
     user_signout(session_id)
 
     ## then remove cookie 

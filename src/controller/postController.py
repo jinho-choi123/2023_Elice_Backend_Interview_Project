@@ -97,6 +97,10 @@ def posts_pagination(db: Session, post_pagination: postPagination, total_posts_s
     if pageNum > lastPageNum:
         pageNum = lastPageNum
 
+    # if pageNum <= 0 then set pageNum to 1
+    if pageNum <= 0:
+        pageNum = 1
+
     # calculate offset and limit
     offset = (pageNum - 1) * pageSize
     limit = pageSize

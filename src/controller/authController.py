@@ -90,22 +90,22 @@ def user_signout(cookie: str):
 
 def get_user_session(db: Session, user_id: int):
     stmt = select(models.User).where(models.User.id == user_id)
-    result = db.scalar(stmt)
+    result = db.execute(stmt).fetchone()
     if not result:
         return None 
     else:
         # get user's owning boards and posts ids
         board_ids = list()
         post_ids = list()
-        for board in result.boards:
+        for board in result[0].boards:
             board_ids.append(int(board.id))
 
-        for post in result.posts:
+        for post in result[0].posts:
             post_ids.append(int(post.id))
 
         return userSession(
-            fullName = result.fullName,
-            email =  result.email,
+            fullName = result[0].fullName,
+            email =  result[0].email,
             board_ids = board_ids,
             post_ids = post_ids,
             id = user_id

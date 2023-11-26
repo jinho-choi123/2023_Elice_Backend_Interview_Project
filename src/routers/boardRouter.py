@@ -11,9 +11,7 @@ boardRouter = APIRouter(
 )
 
 @boardRouter.post("/")
-def board_Create(boardForm: boardBaseRequest, response: Response, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db)):
-    user = get_current_user(session_id)
-
+def board_Create(boardForm: boardBaseRequest, response: Response, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
     # check if board name is already occupied 
     if get_board_by_name(db, boardForm.name):
         response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -34,9 +32,7 @@ def board_Create(boardForm: boardBaseRequest, response: Response, session_id: st
         )
 
 @boardRouter.patch("/{board_id}")
-def board_Update(board_id: int, boardForm: boardBaseRequest, session_id: str | None = Cookie(default=None),  db: Session = Depends(get_db)):
-    user = get_current_user(session_id)
-
+def board_Update(board_id: int, boardForm: boardBaseRequest, session_id: str | None = Cookie(default=None),  db: Session = Depends(get_db), user = Depends(get_current_user)):
     ## check if current user is board owner 
     if not is_board_owner(board_id, user):
         return boardResponse(
@@ -66,9 +62,7 @@ def board_Update(board_id: int, boardForm: boardBaseRequest, session_id: str | N
         )
 
 @boardRouter.delete("/{board_id}")
-def board_Delete(board_id: int, session_id: str | None = Cookie(default=None),  db: Session = Depends(get_db)):
-    user = get_current_user(session_id)
-
+def board_Delete(board_id: int, session_id: str | None = Cookie(default=None),  db: Session = Depends(get_db), user = Depends(get_current_user)):
     if not get_board_by_id(db, board_id):
         return boardResponse(
             success = False,
@@ -96,9 +90,7 @@ def board_Delete(board_id: int, session_id: str | None = Cookie(default=None),  
 # should be front of get /. 
 # else, this endpoint wouldnt be reached
 @boardRouter.get("/list")
-def board_List(page: int = 0, pageSize: int = 10, session_id: str | None = Cookie(default=None),  db: Session = Depends(get_db)):
-    user = get_current_user(session_id)
-
+def board_List(page: int = 0, pageSize: int = 10, session_id: str | None = Cookie(default=None),  db: Session = Depends(get_db), user = Depends(get_current_user)):
     board_pagination = boardPagination(page = page, pageSize = pageSize)
     total_boards = total_boards_size(db)
     showing_boards = boards_pagination(db, board_pagination, total_boards, user)
@@ -109,8 +101,7 @@ def board_List(page: int = 0, pageSize: int = 10, session_id: str | None = Cooki
     )
 
 @boardRouter.get("/{board_id}")
-def board_Get(board_id: int, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db)):
-    user = get_current_user(session_id)
+def board_Get(board_id: int, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
     board = get_board_by_id(db, board_id)
 
     if not board:
