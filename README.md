@@ -18,6 +18,7 @@
     - [Getting Started](#getting-started)
         - [Setting Redis and Postgres](#setting-redis-and-postgres)
         - [Running Development Server](#running-development-server)
+        - [API Testing](#api-testing)
     - [Folder Structure](#folder-structure)
     - [Built With](#built-with)
     - [Author](#author)
@@ -75,6 +76,14 @@ $ source .venv/bin/activate
 $ pip install -r requirements.txt
 $ uvicorn main:app --reload
 ```
+
+#### API testing
+```bash
+# You can run API Tests by running the following command in your project root
+$ python -m pytest -v
+```
+**If you want to add your custom testing, then add test_{your test name}.py to src/tests directory. Also refer to [Fast API Testing](https://fastapi.tiangolo.com/tutorial/testing/).**
+
 
 ### Folder Structure
 ```text
