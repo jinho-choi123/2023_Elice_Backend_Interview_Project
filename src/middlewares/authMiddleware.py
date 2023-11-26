@@ -1,9 +1,8 @@
-from fastapi import Cookie, HTTPException, Request, status
+from fastapi import Cookie, Depends, HTTPException, Request, status
 from src.controller.authController import get_user_session
-from src.types.userTypes import userSession
-from src.db.database import SessionLocal, redis_client
+from src.db.database import get_db, get_redis_client
 
-async def get_current_user(session_id: str | None = Cookie(default=None)):
+async def get_current_user(session_id: str | None = Cookie(default=None), db = Depends(get_db), redis_client = Depends(get_redis_client)):
     # handle if cookie is None
     if not session_id:
         raise HTTPException(
@@ -12,7 +11,6 @@ async def get_current_user(session_id: str | None = Cookie(default=None)):
         )
     # get user id from cookie value 
     user_id = redis_client.get(session_id)
-    user_id = int(user_id)
 
     if not user_id:
         raise HTTPException(
@@ -20,7 +18,8 @@ async def get_current_user(session_id: str | None = Cookie(default=None)):
             detail = "Invalid cookie value",
         )
     
-    db = SessionLocal()
+    user_id = int(user_id)
+    
     user_session = get_user_session(db, user_id)
 
     if not user_session:

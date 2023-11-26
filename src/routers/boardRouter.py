@@ -11,7 +11,7 @@ boardRouter = APIRouter(
 )
 
 @boardRouter.post("/")
-def board_Create(boardForm: boardBaseRequest, response: Response, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
+def board_Create(boardForm: boardBaseRequest, response: Response, db: Session = Depends(get_db), user = Depends(get_current_user)):
     # check if board name is already occupied 
     if get_board_by_name(db, boardForm.name):
         response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -32,18 +32,21 @@ def board_Create(boardForm: boardBaseRequest, response: Response, session_id: st
         )
 
 @boardRouter.patch("/{board_id}")
-def board_Update(board_id: int, boardForm: boardBaseRequest, session_id: str | None = Cookie(default=None),  db: Session = Depends(get_db), user = Depends(get_current_user)):
+def board_Update(board_id: int, response: Response, boardForm: boardBaseRequest, db: Session = Depends(get_db), user = Depends(get_current_user)):
     ## check if current user is board owner 
     if not is_board_owner(board_id, user):
-        return boardResponse(
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return boardObjResponse(
             success = False,
-            message = "LoggedIn user is not board owner."
+            message = "LoggedIn user is not board owner.",
+            board = None 
         )
     
     if check_board_name_exists_except(db, boardForm.name, board_id):
-        return boardResponse(
+        return boardObjResponse(
             success = False,
-            message = "Given board name is already occupied."
+            message = "Given board name is already occupied.",
+            board = None
         )
     
     boardForm = boardUpdate(
@@ -51,18 +54,21 @@ def board_Update(board_id: int, boardForm: boardBaseRequest, session_id: str | N
         id = board_id
     )
     if board_update(db, boardForm):
-        return boardResponse(
+        updatedBoard = get_board_by_id(db, board_id)
+        return boardObjResponse(
             success = True,
-            message = "Board update success!"
+            message = "Board update success!",
+            board = updatedBoard
         )
     else:
-        return boardResponse(
+        return boardObjResponse(
             success = False, 
-            message = "Board update failed. Please try again."
+            message = "Board update failed. Please try again.",
+            board = None
         )
 
 @boardRouter.delete("/{board_id}")
-def board_Delete(board_id: int, session_id: str | None = Cookie(default=None),  db: Session = Depends(get_db), user = Depends(get_current_user)):
+def board_Delete(board_id: int, response: Response, db: Session = Depends(get_db), user = Depends(get_current_user)):
     if not get_board_by_id(db, board_id):
         return boardResponse(
             success = False,
@@ -71,6 +77,7 @@ def board_Delete(board_id: int, session_id: str | None = Cookie(default=None),  
 
     ## check if current user is board owner 
     if not is_board_owner(board_id, user):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
         return boardResponse(
             success = False,
             message = "User is not board owner."
@@ -90,7 +97,7 @@ def board_Delete(board_id: int, session_id: str | None = Cookie(default=None),  
 # should be front of get /. 
 # else, this endpoint wouldnt be reached
 @boardRouter.get("/list")
-def board_List(page: int = 0, pageSize: int = 10, session_id: str | None = Cookie(default=None),  db: Session = Depends(get_db), user = Depends(get_current_user)):
+def board_List(page: int = 0, pageSize: int = 10, db: Session = Depends(get_db), user = Depends(get_current_user)):
     board_pagination = boardPagination(page = page, pageSize = pageSize)
     total_boards = total_boards_size(db)
     showing_boards = boards_pagination(db, board_pagination, total_boards, user)
@@ -101,7 +108,7 @@ def board_List(page: int = 0, pageSize: int = 10, session_id: str | None = Cooki
     )
 
 @boardRouter.get("/{board_id}")
-def board_Get(board_id: int, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
+def board_Get(board_id: int, response: Response, db: Session = Depends(get_db), user = Depends(get_current_user)):
     board = get_board_by_id(db, board_id)
 
     if not board:
@@ -118,9 +125,10 @@ def board_Get(board_id: int, session_id: str | None = Cookie(default=None), db: 
             board = board
         )
     else:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
         return boardObjResponse(
             success = False,
-            message = "Board get failed",
+            message = "Board get failed. Board is not accessible.",
             board = None
         )
 

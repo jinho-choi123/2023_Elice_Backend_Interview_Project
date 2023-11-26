@@ -11,6 +11,16 @@ services:
             - postgres-data:/var/lib/postgresql/data
         ports:
             - "127.0.0.1:25000:5432"
+
+    postgres-test:
+        image: postgres:13 
+        environment:
+            - POSTGRES_DB=test
+            - POSTGRES_USER=test
+            - POSTGRES_PASSWORD=testpassword
+        ports:
+            - "127.0.0.1:30000:5432"
+
     redis:
         image: redis:latest
         ports:

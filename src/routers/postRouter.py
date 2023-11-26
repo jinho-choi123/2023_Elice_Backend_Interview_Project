@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Cookie, Depends
+from fastapi import APIRouter, Cookie, Depends, Response, status
 from sqlalchemy.orm import Session
 from src.controller.postController import get_post_by_id, is_post_owner, post_create, post_delete, post_update, posts_pagination, total_posts_size
+from src.controller.boardController import get_board_by_id, is_board_owner
 from src.db.database import get_db
 
 from src.middlewares.authMiddleware import get_current_user
@@ -13,7 +14,7 @@ postRouter = APIRouter(
 
     
 @postRouter.post("/")
-def post_Create(postForm: postBaseRequest, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
+def post_Create(postForm: postBaseRequest, db: Session = Depends(get_db), user = Depends(get_current_user)):
     # create post 
     newPost = post_create(db, postForm, user)
 
@@ -32,27 +33,32 @@ def post_Create(postForm: postBaseRequest, session_id: str | None = Cookie(defau
     )
 
 @postRouter.patch("/")
-def post_Update(postForm: postBaseRequest, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
+def post_Update(postForm: postBaseRequest, response: Response, db: Session = Depends(get_db), user = Depends(get_current_user)):
     if not is_post_owner(postForm.id, user):
-        return postResponse(
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return postObjResponse(
             success = False,
-            message = "current user is not post owner. cannot update"
+            message = "current user is not post owner. cannot update",
+            post = None 
         )
     
     post_update(db, postForm)
-    return postResponse(
+    updatedPost = get_post_by_id(db, postForm.id)
+    return postObjResponse(
         success = True,
-        message = "Post update success!"
+        message = "Post update success!",
+        post = updatedPost
     )
 
 @postRouter.delete("/{post_id}")
-def post_Delete(post_id: int, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
+def post_Delete(post_id: int, response: Response, db: Session = Depends(get_db), user = Depends(get_current_user)):
     if not get_post_by_id(db, post_id):
         return postResponse(
             success = False,
             message = "Post does not exists"
         )
     if not is_post_owner(post_id, user):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
         return postResponse(
             success = False,
             message = "User is not post owner"
@@ -70,11 +76,23 @@ def post_Delete(post_id: int, session_id: str | None = Cookie(default=None), db:
     )
 
 @postRouter.get("/list")
-def post_List(boardId: int, page: int = 0, pageSize: int = 10, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
+def post_List(boardId: int, response: Response, page: int = 0, pageSize: int = 10, db: Session = Depends(get_db), user = Depends(get_current_user)):
     if not boardId:
+        response.status_code = status.HTTP_400_BAD_REQUEST
         return postListResponse(
             success = False,
             message = "Board Id is not given",
+            posts = None
+        )
+    
+    # check if board is public or user is owner
+    isBoardPublic = get_board_by_id(db, boardId).isPublic
+
+    if (not isBoardPublic) and (not is_board_owner(boardId, user)):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return postListResponse(
+            success = False,
+            message = "User does not have access to the board.",
             posts = None
         )
     
@@ -91,7 +109,7 @@ def post_List(boardId: int, page: int = 0, pageSize: int = 10, session_id: str |
     )
 
 @postRouter.get("/{post_id}")
-def post_Get(post_id: int, session_id: str | None = Cookie(default=None), db: Session = Depends(get_db), user = Depends(get_current_user)):
+def post_Get(post_id: int, response: Response, db: Session = Depends(get_db), user = Depends(get_current_user)):
     post = get_post_by_id(db, post_id)
 
     if not post:
@@ -107,6 +125,7 @@ def post_Get(post_id: int, session_id: str | None = Cookie(default=None), db: Se
             post = post
         )
     else:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
         return postObjResponse(
             success = False,
             message = "Post is not viewable. Please check if you are the owner of the post or the post is in public board",
