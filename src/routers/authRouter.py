@@ -26,7 +26,7 @@ def auth_Signup(signupForm: authSignupRequest, db: Session = Depends(get_db)) ->
 def auth_Signin(signinForm: authSigninRequest, response: Response, db: Session = Depends(get_db)) -> authResponse:
     if(check_user_exists(db, signinForm.email)):
         response.status_code = status.HTTP_401_UNAUTHORIZED
-        return authResponse(success = False, message = "Invalid email or password.")
+        return authResponse(success = False, message = "User not found. Please signup.")
 
     # check password 
     cookie = user_signin(db, signinForm)
@@ -36,6 +36,7 @@ def auth_Signin(signinForm: authSigninRequest, response: Response, db: Session =
         response.set_cookie(key='session_id', value=cookie)
         return authResponse(success = True, message = "signin success")
     else:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
         return authResponse(success = False, message = "Invalid email or password.")
 
 @authRouter.post("/signout")
