@@ -3,7 +3,7 @@ from fastapi import status
 from src.utils.test_db_setup import override_get_db, refresh_db, override_get_redis_client, refresh_redis
 
 from src.types.boardTypes import boardBaseRequest, boardObjResponse, boardUpdate, boardObj, boardResponse, boardListResponse
-from src.types.postTypes import postBaseRequest, postObjResponse, postObj, postResponse, postListResponse
+from src.types.postTypes import postBaseRequest, postObjResponse, postObj, postResponse, postListResponse, postUpdateRequest
 from src.types.authTypes import authResponse, authSigninRequest, authSignupRequest
 from src.types.postTypes import postBaseRequest
 
@@ -171,12 +171,11 @@ def test_private_post(refresh_db, refresh_redis):
         ).model_dump()
 
     # update private post
-    updatePostForm = postBaseRequest(
-        id = 1,
+    updatePostForm = postUpdateRequest(
         title = "modified title",
         content = "modified content!"
     )
-    response = client.patch("/api/post", json = updatePostForm.model_dump())
+    response = client.patch("/api/post/1", json = updatePostForm.model_dump())
 
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     assert response.json() == postObjResponse(

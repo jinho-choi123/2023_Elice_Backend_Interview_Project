@@ -4,7 +4,7 @@ from src.utils.test_db_setup import override_get_db, refresh_db, override_get_re
 
 from src.types.boardTypes import boardBaseRequest, boardObjResponse, boardUpdate, boardObj, boardResponse, boardListResponse
 from src.types.authTypes import authResponse, authSigninRequest, authSignupRequest
-from src.types.postTypes import postBaseRequest, postObjResponse, postObj, postResponse
+from src.types.postTypes import postBaseRequest, postObjResponse, postObj, postResponse, postUpdateRequest
 
 from main import app
 from src.db.database import get_db, get_redis_client
@@ -28,7 +28,7 @@ def test_post_without_signin(refresh_db, refresh_redis):
     assert response.json() == {"detail": "Cookie does not exists"}
 
     # update post without signin
-    response = client.patch("/api/post", json = postForm.model_dump())
+    response = client.patch("/api/post/1", json = postForm.model_dump())
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     assert response.json() == {"detail": "Cookie does not exists"}
 
@@ -109,18 +109,17 @@ def test_post_integrated(refresh_db, refresh_redis):
     ).model_dump()
 
     # post udpate 
-    updatePostForm = postBaseRequest(
-        id = 1,
+    updatePostForm = postUpdateRequest(
         title = "modified title",
         content = "modified content!"
     )
-    response = client.patch("/api/post", json = updatePostForm.model_dump())
+    response = client.patch("/api/post/1", json = updatePostForm.model_dump())
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == postObjResponse(
         success=True,
         message = "Post update success!",
         post = postObj(
-            id = 1, 
+            id = 1,
             title = "modified title",
             content = "modified content!",
             creator_id = 1,
