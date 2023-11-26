@@ -4,7 +4,7 @@ from src.db import models, database
 from sqlalchemy import asc, delete, desc, select, func, update
 from sqlalchemy.exc import SQLAlchemyError
 
-from src.types.postTypes import postBaseRequest, postDeletion, postObj, postPagination
+from src.types.postTypes import postBaseRequest, postDeletion, postObj, postPagination, postUpdateRequest
 from src.types.userTypes import userSession
 import math
 
@@ -49,11 +49,11 @@ def post_create(db: Session, postForm: postBaseRequest, user_session: userSessio
             detail = str(e.orig)
         )
 
-def post_update(db: Session, postForm: postBaseRequest):
+def post_update(db: Session, postForm: postUpdateRequest, post_id: int):
     try:
         stmt = (
             update(models.Post)
-                .where(models.Post.id == postForm.id)
+                .where(models.Post.id == post_id)
                 .values(
                     {
                         models.Post.title: postForm.title,

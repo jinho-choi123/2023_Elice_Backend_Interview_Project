@@ -5,7 +5,7 @@ from src.controller.boardController import get_board_by_id, is_board_owner
 from src.db.database import get_db
 
 from src.middlewares.authMiddleware import get_current_user
-from src.types.postTypes import postBaseRequest, postDeletion, postListResponse, postObjResponse, postPagination, postResponse 
+from src.types.postTypes import postBaseRequest, postDeletion, postListResponse, postObjResponse, postPagination, postResponse, postUpdateRequest 
 
 postRouter = APIRouter(
     prefix="/post",
@@ -32,9 +32,9 @@ def post_Create(postForm: postBaseRequest, db: Session = Depends(get_db), user =
         post = newPost
     )
 
-@postRouter.patch("/")
-def post_Update(postForm: postBaseRequest, response: Response, db: Session = Depends(get_db), user = Depends(get_current_user)):
-    if not is_post_owner(postForm.id, user):
+@postRouter.patch("/{post_id}")
+def post_Update(post_id: int, postForm: postUpdateRequest, response: Response, db: Session = Depends(get_db), user = Depends(get_current_user)):
+    if not is_post_owner(post_id, user):
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return postObjResponse(
             success = False,
@@ -42,8 +42,8 @@ def post_Update(postForm: postBaseRequest, response: Response, db: Session = Dep
             post = None 
         )
     
-    post_update(db, postForm)
-    updatedPost = get_post_by_id(db, postForm.id)
+    post_update(db, postForm, post_id)
+    updatedPost = get_post_by_id(db, post_id)
     return postObjResponse(
         success = True,
         message = "Post update success!",

@@ -14,11 +14,15 @@ class postObjResponse(BaseModel):
     message: str 
     post: postObj | None
 
-class postBaseRequest(BaseModel):
-    id: int
+
+class postUpdateRequest(BaseModel):
     title: str 
     content: str 
 
+class postBaseRequest(postUpdateRequest):
+    id: int
+
+    
 class postResponse(BaseModel):
     success: bool
     message: str 
