@@ -70,6 +70,9 @@ You need Postgres and Redis running on your local machine before running our ser
 ```
 Run Dev server
 ```bash
+$ python -m venv .venv 
+$ source .venv/bin/activate
+
 $ pip install -r requirements.txt
 $ uvicorn main:app --reload
 ```
