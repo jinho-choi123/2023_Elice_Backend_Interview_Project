@@ -32,9 +32,10 @@ def board_Create(boardForm: boardBaseRequest, response: Response, db: Session = 
         )
 
 @boardRouter.patch("/{board_id}")
-def board_Update(board_id: int, boardForm: boardBaseRequest, db: Session = Depends(get_db), user = Depends(get_current_user)):
+def board_Update(board_id: int, response: Response, boardForm: boardBaseRequest, db: Session = Depends(get_db), user = Depends(get_current_user)):
     ## check if current user is board owner 
     if not is_board_owner(board_id, user):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
         return boardObjResponse(
             success = False,
             message = "LoggedIn user is not board owner.",
