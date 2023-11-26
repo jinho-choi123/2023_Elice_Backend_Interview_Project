@@ -59,8 +59,7 @@ List of environment variables required are specified in [here](https://github.co
 Run the following commands to setup redis and postgres server.
 Please refer to [docker-compose.yml](https://github.com/jinho-choi123/2023_Alice_Backend_Interview_Project/blob/main/.docker/docker-compose.yml) to get more info.
 ```bash
-$ cd .docker
-$ docker compose -p 2023-alice-interview up -d
+$ docker compose -f .docker/docker-compose.yml -p 2023-alice-project up -d
 ```
 
 
