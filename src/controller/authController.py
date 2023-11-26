@@ -62,7 +62,7 @@ def user_signin(db: Session, redis_client , signinForm: authSigninRequest):
     SESSION_EXP_TIME = int(os.environ["SESSION_EXP_TIME"])
 
     ## get password hash from db
-    stmt = select(models.User).where(models.User.id == 1)
+    stmt = select(models.User).where(models.User.email == signinForm.email)
     result = db.scalar(stmt)
 
     ## must not happen 
