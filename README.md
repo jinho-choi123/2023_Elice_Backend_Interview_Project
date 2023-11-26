@@ -88,32 +88,43 @@ $ python -m pytest -v
 ### Folder Structure
 ```text
 2023-alice-backend-interview-project
+.
+├── README.md
 ├── config.py
 ├── main.py
 ├── requirements.txt
-└── src
-    ├── controller
-    │   ├── authController.py
-    │   ├── boardController.py
-    │   └── postController.py
-    ├── db
-    │   ├── database.py
-    │   └── models.py
-    ├── middlewares
-    │   └── authMiddleware.py
-    ├── routers
-    │   ├── authRouter.py
-    │   ├── boardRouter.py
-    │   ├── index.py
-    │   └── postRouter.py
-    ├── types
-    │   ├── authTypes.py
-    │   ├── boardTypes.py
-    │   ├── postTypes.py
-    │   └── userTypes.py
-    └── utils
-        ├── hash.py
-        └── session.py
+├── src
+│   ├── controller
+│   │   ├── authController.py
+│   │   ├── boardController.py
+│   │   └── postController.py
+│   ├── db
+│   │   ├── database.py
+│   │   └── models.py
+│   ├── middlewares
+│   │   └── authMiddleware.py
+│   ├── routers
+│   │   ├── authRouter.py
+│   │   ├── boardRouter.py
+│   │   ├── index.py
+│   │   └── postRouter.py
+│   ├── tests
+│   │   ├── test_auth.py
+│   │   ├── test_board.py
+│   │   ├── test_hc.py
+│   │   ├── test_post.py
+│   │   └── test_private_board.py
+│   ├── types
+│   │   ├── authTypes.py
+│   │   ├── boardTypes.py
+│   │   ├── postTypes.py
+│   │   └── userTypes.py
+│   └── utils
+│       ├── hash.py
+│       ├── session.py
+│       └── test_db_setup.py
+└── static
+    └── api-document-screenshot.png
 ```
 
 ### Built With
