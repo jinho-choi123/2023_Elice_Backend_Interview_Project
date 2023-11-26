@@ -17,8 +17,6 @@ services:
             - POSTGRES_DB=test
             - POSTGRES_USER=test
             - POSTGRES_PASSWORD=testpassword
-        volumes:
-            - postgres-test-data:/var/lib/postgresql/data
         ports:
             - "127.0.0.1:25200:5432"
     redis:
