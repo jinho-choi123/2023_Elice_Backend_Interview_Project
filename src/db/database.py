@@ -22,10 +22,11 @@ def get_db():
     finally:
         db.close()
 
-## create connection to redis 
-redis_client = redis.from_url(REDIS_URL)
 
-if(redis_client.ping()):
-    print("REDIS CLIENT CONNECTED")
-else:
-    print("REDIS CLIENT NOT CONNECTED")
+
+def get_redis_client():
+    try:
+        redis_client = redis.from_url(REDIS_URL)
+        yield redis_client
+    except:
+        print("Error occur while executing get_redis_client")

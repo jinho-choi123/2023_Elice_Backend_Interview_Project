@@ -1,9 +1,8 @@
 from fastapi import Cookie, Depends, HTTPException, Request, status
 from src.controller.authController import get_user_session
-from src.db.database import get_db
-from src.db.database import SessionLocal, redis_client
+from src.db.database import get_db, get_redis_client
 
-async def get_current_user(session_id: str | None = Cookie(default=None), db = Depends(get_db)):
+async def get_current_user(session_id: str | None = Cookie(default=None), db = Depends(get_db), redis_client = Depends(get_redis_client)):
     # handle if cookie is None
     if not session_id:
         raise HTTPException(

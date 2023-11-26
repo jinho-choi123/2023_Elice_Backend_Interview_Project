@@ -5,7 +5,7 @@ from src.types.authTypes import authSignupRequest, authSigninRequest, authRespon
 from src.types.userTypes import userSession
 from src.controller.authController import check_user_exists, user_signin, user_signout, user_signup
 
-from src.db.database import SessionLocal, get_db
+from src.db.database import  get_db, get_redis_client
 
 authRouter = APIRouter(
     prefix="/auth",
@@ -23,13 +23,13 @@ def auth_Signup(signupForm: authSignupRequest, db: Session = Depends(get_db)) ->
     return authResponse(success = True, message = "signup success")
 
 @authRouter.post("/signin")
-def auth_Signin(signinForm: authSigninRequest, response: Response, db: Session = Depends(get_db)) -> authResponse:
+def auth_Signin(signinForm: authSigninRequest, response: Response, db: Session = Depends(get_db), redis_client = Depends(get_redis_client)) -> authResponse:
     if(check_user_exists(db, signinForm.email)):
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return authResponse(success = False, message = "User not found. Please signup.")
 
     # check password 
-    cookie = user_signin(db, signinForm)
+    cookie = user_signin(db, redis_client, signinForm)
     if cookie:
         ## login success 
         ## set cookie 
@@ -40,8 +40,8 @@ def auth_Signin(signinForm: authSigninRequest, response: Response, db: Session =
         return authResponse(success = False, message = "Invalid email or password.")
 
 @authRouter.post("/signout")
-def auth_Signout(response: Response, session_id: str | None = Cookie(default=None), user = Depends(get_current_user)):
-    user_signout(session_id)
+def auth_Signout(response: Response, session_id: str | None = Cookie(default=None), user = Depends(get_current_user), redis_client = Depends(get_redis_client)):
+    user_signout(session_id, redis_client)
 
     ## then remove cookie 
     response.delete_cookie(key='session_id')

@@ -6,9 +6,10 @@ from src.types.authTypes import authSigninRequest, authSignupRequest
 from src.types.userTypes import userCreation
 from src.utils.hash import check_password_match, generate_rand_salt, hash_password
 from sqlalchemy.exc import SQLAlchemyError
-from src.db.database import redis_client
+from src.db.database import get_redis_client
 from src.utils.session import generate_cookie
 from src.types.userTypes import userSession
+from fastapi import Depends
 
 # return True if user does not exists
 # return False o/w
@@ -55,7 +56,7 @@ def user_signup(db: Session, signupForm: authSignupRequest):
         print(str(e.orig))
         return False
 
-def user_signin(db: Session, signinForm: authSigninRequest):
+def user_signin(db: Session, redis_client , signinForm: authSigninRequest):
     # check if user is valid 
     # assume that user record with given email exists
     SESSION_EXP_TIME = int(os.environ["SESSION_EXP_TIME"])
@@ -84,7 +85,7 @@ def user_signin(db: Session, signinForm: authSigninRequest):
     
 # signout user
 # expire redis session
-def user_signout(cookie: str):
+def user_signout(cookie: str, redis_client):
     redis_client.delete(cookie)
     return
 
