@@ -125,9 +125,7 @@ def boards_pagination(db: Session, board_pagination: boardPagination, total_boar
     if pageNum <= 0:
         pageNum = 1
 
-    print(total_boards_size)
     lastPageNum = math.ceil(total_boards_size / pageSize)
-    print(lastPageNum)
 
     # if pageNum exceeds boards_size/pageSize, then return end page
     if pageNum > lastPageNum:
