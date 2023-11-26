@@ -67,7 +67,7 @@ def board_Update(board_id: int, boardForm: boardBaseRequest, db: Session = Depen
         )
 
 @boardRouter.delete("/{board_id}")
-def board_Delete(board_id: int, db: Session = Depends(get_db), user = Depends(get_current_user)):
+def board_Delete(board_id: int, response: Response, db: Session = Depends(get_db), user = Depends(get_current_user)):
     if not get_board_by_id(db, board_id):
         return boardResponse(
             success = False,
@@ -76,6 +76,7 @@ def board_Delete(board_id: int, db: Session = Depends(get_db), user = Depends(ge
 
     ## check if current user is board owner 
     if not is_board_owner(board_id, user):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
         return boardResponse(
             success = False,
             message = "User is not board owner."
@@ -123,6 +124,7 @@ def board_Get(board_id: int, response: Response, db: Session = Depends(get_db), 
             board = board
         )
     else:
+        response.status_code = status.HTTP_401_UNAUTHORIZED
         return boardObjResponse(
             success = False,
             message = "Board get failed. Board is not accessible.",
