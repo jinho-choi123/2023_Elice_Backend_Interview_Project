@@ -34,15 +34,18 @@ def post_Create(postForm: postBaseRequest, db: Session = Depends(get_db), user =
 @postRouter.patch("/")
 def post_Update(postForm: postBaseRequest, db: Session = Depends(get_db), user = Depends(get_current_user)):
     if not is_post_owner(postForm.id, user):
-        return postResponse(
+        return postObjResponse(
             success = False,
-            message = "current user is not post owner. cannot update"
+            message = "current user is not post owner. cannot update",
+            post = None 
         )
     
     post_update(db, postForm)
-    return postResponse(
+    updatedPost = get_post_by_id(db, postForm.id)
+    return postObjResponse(
         success = True,
-        message = "Post update success!"
+        message = "Post update success!",
+        post = updatedPost
     )
 
 @postRouter.delete("/{post_id}")

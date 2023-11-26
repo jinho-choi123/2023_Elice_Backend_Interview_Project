@@ -35,15 +35,17 @@ def board_Create(boardForm: boardBaseRequest, response: Response, db: Session = 
 def board_Update(board_id: int, boardForm: boardBaseRequest, db: Session = Depends(get_db), user = Depends(get_current_user)):
     ## check if current user is board owner 
     if not is_board_owner(board_id, user):
-        return boardResponse(
+        return boardObjResponse(
             success = False,
-            message = "LoggedIn user is not board owner."
+            message = "LoggedIn user is not board owner.",
+            board = None 
         )
     
     if check_board_name_exists_except(db, boardForm.name, board_id):
-        return boardResponse(
+        return boardObjResponse(
             success = False,
-            message = "Given board name is already occupied."
+            message = "Given board name is already occupied.",
+            board = None
         )
     
     boardForm = boardUpdate(
@@ -51,14 +53,17 @@ def board_Update(board_id: int, boardForm: boardBaseRequest, db: Session = Depen
         id = board_id
     )
     if board_update(db, boardForm):
-        return boardResponse(
+        updatedBoard = get_board_by_id(db, board_id)
+        return boardObjResponse(
             success = True,
-            message = "Board update success!"
+            message = "Board update success!",
+            board = updatedBoard
         )
     else:
-        return boardResponse(
+        return boardObjResponse(
             success = False, 
-            message = "Board update failed. Please try again."
+            message = "Board update failed. Please try again.",
+            board = None
         )
 
 @boardRouter.delete("/{board_id}")
@@ -101,7 +106,7 @@ def board_List(page: int = 0, pageSize: int = 10, db: Session = Depends(get_db),
     )
 
 @boardRouter.get("/{board_id}")
-def board_Get(board_id: int, db: Session = Depends(get_db), user = Depends(get_current_user)):
+def board_Get(board_id: int, response: Response, db: Session = Depends(get_db), user = Depends(get_current_user)):
     board = get_board_by_id(db, board_id)
 
     if not board:
@@ -120,7 +125,7 @@ def board_Get(board_id: int, db: Session = Depends(get_db), user = Depends(get_c
     else:
         return boardObjResponse(
             success = False,
-            message = "Board get failed",
+            message = "Board get failed. Board is not accessible.",
             board = None
         )
 
